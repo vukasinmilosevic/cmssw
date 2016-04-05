@@ -57,11 +57,12 @@ def runMVAMET(process,
         process.p = cms.Path()
     process.p += process.jmfw_analyzers
     # additional contribution from hadronically decaying taus
-    from RecoMET.METPUSubtraction.tausSignificance import tausSignificance, tauMET, tauPFMET, tauDecayProducts
+    from RecoMET.METPUSubtraction.tausSignificance import tausSignificance, tauMET, tauPFMET, tauDecayProducts, allDecayProducts
     process.tausSignificance = tausSignificance
     process.tauMET = tauMET
     process.tauPFMET = tauPFMET
     process.tauDecayProducts = tauDecayProducts
+    process.allDecayProducts = allDecayProducts
    
     relativeIsoCutMuonsLoose = relativeIsoCutMuons+0.05;
     relativeIsoCutEletronsLoose = relativeIsoCutEletrons+0.05;    
