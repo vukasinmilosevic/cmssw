@@ -80,7 +80,7 @@ def    applyTauID( process,
     setattr(process,src+label,cms.EDFilter("PATTauRefSelector",
                                            src = cms.InputTag(src),
                                            filter = cms.bool(False),
-                                           cut  = cms.string('pt > %f & abs(eta) < %f & tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits") < 1.5 & tauID("againstMuonLoose3") > 0.5 & tauID("againstElectronLooseMVA5") > 0.5 '%(ptCut,etaCut))
+                                           cut  = cms.string('pt > %f & abs(eta) < %f & tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits") < 1.5 & tauID("againstMuonLoose3") > 0.5 & tauID("againstElectronLooseMVA6") > 0.5 '%(ptCut,etaCut))
                                            ));
 
 
@@ -90,7 +90,7 @@ def    applyTauID( process,
     setattr(process,src+label, cms.EDFilter("PATTauRefSelector",
                                             src = cms.InputTag(src),
                                             filter = cms.bool(False),
-                                            cut  = cms.string('pt > %f & abs(eta) < %f & tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits") < 1.5 & tauID("againstMuonMedium3") > 0.5 & tauID("againstElectronMediumMVA5") > 0.5 '%(ptCut,etaCut)),
+                                            cut  = cms.string('pt > %f & abs(eta) < %f & tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits") < 1.5 & tauID("againstMuonMedium3") > 0.5 & tauID("againstElectronMediumMVA6") > 0.5 '%(ptCut,etaCut)),
                                            ));
   ## tau tight ID
   elif label == "Tight" or label == "tight" :  
@@ -98,7 +98,7 @@ def    applyTauID( process,
     setattr(process,src+label, cms.EDFilter("PATTauRefSelector",
                                            src = cms.InputTag(src),
                                            filter = cms.bool(False),
-                                           cut  = cms.string('pt > %f & abs(eta) < %f & tauID("byTightCombinedIsolationDeltaBetaCorr3Hits") < 1.5 & tauID("againstMuonTight3") > 0.5 & tauID("againstElectronTightMVA5") > 0.5 '%(ptCut,etaCut))
+                                           cut  = cms.string('pt > %f & abs(eta) < %f & tauID("byTightCombinedIsolationDeltaBetaCorr3Hits") < 1.5 & tauID("againstMuonTight3") > 0.5 & tauID("againstElectronTightMVA6") > 0.5 '%(ptCut,etaCut))
                                             ));
 
   else :
