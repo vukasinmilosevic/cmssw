@@ -60,6 +60,7 @@ def runMVAMET(process,
     from RecoMET.METPUSubtraction.tausSignificance import tausSignificance, tauMET, tauPFMET, tauDecayProducts, allDecayProducts
     process.tausSignificance = tausSignificance
     process.tauMET = tauMET
+    process.tauMET.srcPFCands =  cms.InputTag("packedPFCandidates")
     process.tauPFMET = tauPFMET
     process.tauDecayProducts = tauDecayProducts
     process.allDecayProducts = allDecayProducts

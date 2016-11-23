@@ -5,8 +5,8 @@ from PhysicsTools.PatAlgos.tools.tauTools import *
 from RecoMET.METPUSubtraction.MVAMETConfiguration_cff import runMVAMET
 
 options = VarParsing ('python')
-options.register ('globalTag',"80X_mcRun2_asymptotic_v5",VarParsing.multiplicity.singleton,VarParsing.varType.string,'input global tag to be used');
-options.register ('inputFile', 'root://xrootd.unl.edu//store/mc/RunIIFall15MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/70000/0232D37A-77BA-E511-B3C5-0CC47A4C8EA8.root', VarParsing.multiplicity.singleton, VarParsing.varType.string, "Path to a testfile")
+options.register ('globalTag',"80X_mcRun2_asymptotic_2016_miniAODv2_v1",VarParsing.multiplicity.singleton,VarParsing.varType.string,'input global tag to be used');
+options.register ('inputFile', 'file:////pnfs/desy.de/cms/tier2/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/40000/00E9D1DA-105D-E611-A56E-FA163EE988CA.root', VarParsing.multiplicity.singleton, VarParsing.varType.string, "Path to a testfile")
 options.register ("localSqlite", '', VarParsing.multiplicity.singleton, VarParsing.varType.string, "Path to a local sqlite file")
 options.register ("reapplyJEC", False, VarParsing.multiplicity.singleton, VarParsing.varType.bool, "Reapply JEC to Jets")
 options.register ("reapplyPUJetID", False, VarParsing.multiplicity.singleton, VarParsing.varType.bool, "Reapply PU Jet ID")
@@ -57,7 +57,11 @@ process.maxEvents = cms.untracked.PSet(
 ) 
 
 process.output = cms.OutputModule("PoolOutputModule",
+<<<<<<< HEAD
                                   fileName = cms.untracked.string('output_particles.root'),
+=======
+                                  fileName = cms.untracked.string('output.root'),
+>>>>>>> 0afc9aab031fafb37e7ee0455fdadc298114131b
                                   outputCommands = cms.untracked.vstring(
                                                                          'keep patMETs_MVAMET_MVAMET_MVAMET',
                                                                          'keep *_patJetsReapplyJEC_*_MVAMET'
