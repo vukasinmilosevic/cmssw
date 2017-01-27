@@ -606,18 +606,28 @@ double AntiElectronIDMVA6::MVAValue(const reco::PFTau& thePFTau,
   Int_t TauSignalPFGammaCandsIn = GammasPtInSigCone.size();
   Int_t TauSignalPFGammaCandsOut = GammasPtOutSigCone.size();
   Float_t TauVisMassIn = (pfGammaSum + pfChargedSum).mass();
-
-  Float_t TauPhi = thePFTau.phi();
+  
+   
+  Float_t TauPhi = -99.;
   float sumPhiTimesEnergy = 0.;
   float sumEnergyPhi = 0.;
+  
+  
   for ( std::vector<reco::PFCandidatePtr>::const_iterator pfCandidate = signalPFCands.begin();
 	pfCandidate != signalPFCands.end(); ++pfCandidate ) {
-    sumPhiTimesEnergy += (*pfCandidate)->positionAtECALEntrance().phi()*(*pfCandidate)->energy();
-    sumEnergyPhi += (*pfCandidate)->energy();
-  }
+      
+      float phi = thePFTau.phi();
+      math::XYZPoint aPos;
+      if ( atECalEntrance(*pfCandidate, aPos) == true ) phi = aPos.Phi();
+      
+      sumPhiTimesEnergy += phi*(*pfCandidate)->energy();   
+      sumEnergyPhi += (*pfCandidate)->energy();
+  }  
   if ( sumEnergyPhi > 0. ) {
-    TauPhi = sumPhiTimesEnergy/sumEnergyPhi;
-  }
+     TauPhi = sumPhiTimesEnergy/sumEnergyPhi;
+  } 
+  
+  
   Float_t TaudCrackPhi = dCrackPhi(TauPhi, TauEtaAtEcalEntrance);
   Float_t TaudCrackEta = dCrackEta(TauEtaAtEcalEntrance);
   Float_t TauHasGsf = thePFTau.leadPFChargedHadrCand()->gsfTrackRef().isNonnull();
@@ -810,17 +820,26 @@ double AntiElectronIDMVA6::MVAValue(const reco::PFTau& thePFTau)
   Int_t TauSignalPFGammaCandsOut = GammasPtOutSigCone.size();
   Float_t TauVisMassIn = (pfGammaSum + pfChargedSum).mass();
 
-  Float_t TauPhi = thePFTau.phi();
+  
+  Float_t TauPhi = -99.;
   float sumPhiTimesEnergy = 0.;
-  float sumEnergyPhi = 0.;
+  float sumEnergyPhi = 0.;  
+  
   for ( std::vector<reco::PFCandidatePtr>::const_iterator pfCandidate = signalPFCands.begin();
 	pfCandidate != signalPFCands.end(); ++pfCandidate ) {
-    sumPhiTimesEnergy += (*pfCandidate)->positionAtECALEntrance().phi()*(*pfCandidate)->energy();
-    sumEnergyPhi += (*pfCandidate)->energy();
-  }
+      
+      float phi = thePFTau.phi();
+      math::XYZPoint aPos;
+      if ( atECalEntrance(*pfCandidate, aPos) == true ) phi = aPos.Phi();
+      
+      sumPhiTimesEnergy += phi*(*pfCandidate)->energy();   
+      sumEnergyPhi += (*pfCandidate)->energy();
+  }  
   if ( sumEnergyPhi > 0. ) {
-    TauPhi = sumPhiTimesEnergy/sumEnergyPhi;
-  }
+     TauPhi = sumPhiTimesEnergy/sumEnergyPhi;
+  } 
+  
+  
   Float_t TaudCrackPhi = dCrackPhi(TauPhi, TauEtaAtEcalEntrance);
   Float_t TaudCrackEta = dCrackEta(TauEtaAtEcalEntrance);
   Float_t TauHasGsf = thePFTau.leadPFChargedHadrCand()->gsfTrackRef().isNonnull();
@@ -941,12 +960,34 @@ double AntiElectronIDMVA6::MVAValue(const pat::Tau& theTau, const pat::Electron&
   Int_t TauSignalPFGammaCandsIn = GammasPtInSigCone.size();
   Int_t TauSignalPFGammaCandsOut = GammasPtOutSigCone.size();
   Float_t TauVisMassIn = (pfGammaSum + pfChargedSum).mass();
+  
+  // Machinery to recompute phi at ecal entrance as used for the training
+  // as phhiAtEcalEntrance not available in time in production
+  // phi extrapolated from latest tracker surface
+  // 
 
-  Float_t TauPhi = theTau.phi();
+  float sumPhiTimesEnergy = 0.;
+  float sumEnergy = 0.;
+   
+  Float_t TauPhi = -99.;
  
-  if ( theTau.phiAtEcalEntrance() != -99. ) {
-    TauPhi = theTau.phiAtEcalEntrance();
+  const reco::CandidatePtrVector signalCands = theTau.signalCands();
+  for (unsigned int o = 0; o < signalCands.size(); o++ ) {
+    pat::PackedCandidate const*  signalCand = dynamic_cast<pat::PackedCandidate const*> (signalCands[o].get());
+ 	 
+      float phi = theTau.phi();
+      math::XYZPoint aPos;
+     
+      if ( atECalEntrance(*signalCand, aPos) == true ) phi = aPos.Phi();
+      
+      sumPhiTimesEnergy += phi*signalCand->energy();     
+      sumEnergy += signalCand->energy();
   }
+  
+  if ( sumEnergy > 0. ) {
+     TauPhi = sumPhiTimesEnergy/sumEnergy;
+  } 
+  
   Float_t TaudCrackPhi = dCrackPhi(TauPhi, TauEtaAtEcalEntrance);
   Float_t TaudCrackEta = dCrackEta(TauEtaAtEcalEntrance); 
   
@@ -1116,11 +1157,34 @@ double AntiElectronIDMVA6::MVAValue(const pat::Tau& theTau)
   Int_t TauSignalPFGammaCandsOut = GammasPtOutSigCone.size();
   Float_t TauVisMassIn = (pfGammaSum + pfChargedSum).mass();
 
-  Float_t TauPhi = theTau.phi();
+  
+  // Machinery to recompute phi at ecal entrance as used for the training
+  // as phhiAtEcalEntrance not available in time in production
+  // phi extrapolated from latest tracker surface
+  // 
+
+  float sumPhiTimesEnergy = 0.;
+  float sumEnergy = 0.;
+   
+  Float_t TauPhi = -99.;
  
-  if ( theTau.phiAtEcalEntrance() != -99. ) {
-    TauPhi = theTau.phiAtEcalEntrance();
+  const reco::CandidatePtrVector signalCands = theTau.signalCands();
+  for (unsigned int o = 0; o < signalCands.size(); o++ ) {
+    pat::PackedCandidate const*  signalCand = dynamic_cast<pat::PackedCandidate const*> (signalCands[o].get());
+ 	 
+      float phi = theTau.phi();
+      math::XYZPoint aPos;
+     
+      if ( atECalEntrance(*signalCand, aPos) == true ) phi = aPos.Phi();
+      
+      sumPhiTimesEnergy += phi*signalCand->energy();     
+      sumEnergy += signalCand->energy();
   }
+  
+  if ( sumEnergy > 0. ) {
+     TauPhi = sumPhiTimesEnergy/sumEnergy;
+  } 
+  
   Float_t TaudCrackPhi = dCrackPhi(TauPhi, TauEtaAtEcalEntrance);
   Float_t TaudCrackEta = dCrackEta(TauEtaAtEcalEntrance); 
   
@@ -1260,4 +1324,68 @@ double AntiElectronIDMVA6::dCrackEta(double eta)
   }
 
   return std::abs(retVal);
+}
+
+bool AntiElectronIDMVA6::atECalEntrance(const pat::PackedCandidate &part,
+		                        math::XYZPoint &pos)
+{
+  bool result = false;
+  
+  double bField = 3.8;//hepefully Teslas are proper units (better to take it from event setup) 
+  BaseParticlePropagator theParticle =
+    BaseParticlePropagator(RawParticle(math::XYZTLorentzVector(part.px(),
+							       part.py(),
+							       part.pz(),
+							       part.energy()),
+				       math::XYZTLorentzVector(part.vertex().x(),
+							       part.vertex().y(),
+							       part.vertex().z(),
+							       0.)), 
+			               0.,0.,bField);
+				       
+  theParticle.setCharge(part.charge());
+
+  theParticle.propagateToEcalEntrance(false);
+
+  if(theParticle.getSuccess()!=0){
+    pos = math::XYZPoint(theParticle.vertex());
+    //mom = math::XYZTLorentzVector(theParticle.momentum());
+    result = true;
+  }
+  else 
+    result = false;
+
+  return result;
+}
+
+bool AntiElectronIDMVA6::atECalEntrance(reco::PFCandidate part,
+		                        math::XYZPoint &pos)
+{
+  bool result = false;
+  
+  double bField = 3.8;//hepefully Teslas are proper units (better to take it from event setup) 
+  BaseParticlePropagator theParticle =
+    BaseParticlePropagator(RawParticle(math::XYZTLorentzVector(part.px(),
+							       part.py(),
+							       part.pz(),
+							       part.energy()),
+				       math::XYZTLorentzVector(part.vertex().x(),
+							       part.vertex().y(),
+							       part.vertex().z(),
+							       0.)), 
+			               0.,0.,bField);
+				       
+  theParticle.setCharge(part.charge());
+
+  theParticle.propagateToEcalEntrance(false);
+
+  if(theParticle.getSuccess()!=0){
+    pos = math::XYZPoint(theParticle.vertex());
+    //mom = math::XYZTLorentzVector(theParticle.momentum());
+    result = true;
+  }
+  else 
+    result = false;
+
+  return result;
 }
