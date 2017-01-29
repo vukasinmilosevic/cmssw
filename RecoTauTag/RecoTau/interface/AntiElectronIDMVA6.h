@@ -134,11 +134,9 @@ class AntiElectronIDMVA6
    // this function can be called for category 1 only !!
    double MVAValue(const pat::Tau& theTau);
    
-   bool atECalEntrance(const pat::PackedCandidate &part,
-		       math::XYZPoint &pos);
-   
-   bool atECalEntrance(reco::PFCandidate part,
-		       math::XYZPoint &pos);
+   //
+   bool atECalEntrance(const reco::Candidate* part,
+		       math::XYZPoint &pos);		       
  private:   
 
    double dCrackEta(double eta);
