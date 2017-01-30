@@ -30,7 +30,9 @@ class PATTauDiscriminationAgainstElectronMVA6 : public PATTauDiscriminationProdu
       category_output_()
   {
     mva_ = new AntiElectronIDMVA6(cfg);
-
+    
+    usefixPhiAtEcalEntrance_ = cfg.getParameter<bool>("usefixPhiAtEcalEntrance");
+    
     srcElectrons = cfg.getParameter<edm::InputTag>("srcElectrons");
     electronToken = consumes<pat::ElectronCollection>(srcElectrons);
     verbosity_ = ( cfg.exists("verbosity") ) ?
@@ -67,6 +69,8 @@ private:
   std::unique_ptr<PATTauDiscriminator> category_output_;
 		
   int verbosity_;
+  
+  bool usefixPhiAtEcalEntrance_;
 };
 
 void PATTauDiscriminationAgainstElectronMVA6::beginEvent(const edm::Event& evt, const edm::EventSetup& es)
@@ -77,6 +81,8 @@ void PATTauDiscriminationAgainstElectronMVA6::beginEvent(const edm::Event& evt, 
   category_output_.reset(new PATTauDiscriminator(TauRefProd(taus_)));
 
   evt.getByToken(electronToken, Electrons);
+  
+  if ( !usefixPhiAtEcalEntrance_ ) throw edm::Exception(edm::errors::UnimplementedFeature) << " old/genuine definition of phiAtEcalEntrance variable not available in miniAODs in release 80X, please modify the cfi file \n";
 }
 
 double PATTauDiscriminationAgainstElectronMVA6::discriminate(const TauRef& theTauRef) const
@@ -107,7 +113,7 @@ double PATTauDiscriminationAgainstElectronMVA6::discriminate(const TauRef& theTa
 	double deltaREleTau = deltaR(theElectron.p4(), theTauRef->p4());
 	deltaRDummy = deltaREleTau;
 	if( deltaREleTau < 0.3 ){ 	
-	  double mva_match = mva_->MVAValue(*theTauRef, theElectron, true);	  
+	  double mva_match = mva_->MVAValue(*theTauRef, theElectron, usefixPhiAtEcalEntrance_);	  
 	  bool hasGsfTrack = 0;
           pat::PackedCandidate const* packedLeadTauCand = dynamic_cast<pat::PackedCandidate const*>(theTauRef->leadChargedHadrCand().get());
           if( abs(packedLeadTauCand->pdgId()) == 11 ) 
@@ -145,7 +151,7 @@ double PATTauDiscriminationAgainstElectronMVA6::discriminate(const TauRef& theTa
      } // end of loop over electrons
 
     if ( !isGsfElectronMatched ) {
-      mvaValue = mva_->MVAValue(*theTauRef, true);
+      mvaValue = mva_->MVAValue(*theTauRef, usefixPhiAtEcalEntrance_);
       bool hasGsfTrack = 0;
       pat::PackedCandidate const* packedLeadTauCand = dynamic_cast<pat::PackedCandidate const*>(theTauRef->leadChargedHadrCand().get());
       if( abs(packedLeadTauCand->pdgId()) == 11 ) hasGsfTrack = 1;
