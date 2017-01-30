@@ -82,7 +82,7 @@ void PATTauDiscriminationAgainstElectronMVA6::beginEvent(const edm::Event& evt, 
 
   evt.getByToken(electronToken, Electrons);
   
-  if ( !usefixPhiAtEcalEntrance_ ) throw edm::Exception(edm::errors::UnimplementedFeature) << " old/genuine definition of phiAtEcalEntrance variable not available in miniAODs in release 80X, please modify the cfi file \n";
+  if ( !usefixPhiAtEcalEntrance_ ) throw edm::Exception(edm::errors::UnimplementedFeature) << "genuine definition of phiAtEcalEntrance not available in miniAODs for release 80X, please modify the cfi file \n";
 }
 
 double PATTauDiscriminationAgainstElectronMVA6::discriminate(const TauRef& theTauRef) const
