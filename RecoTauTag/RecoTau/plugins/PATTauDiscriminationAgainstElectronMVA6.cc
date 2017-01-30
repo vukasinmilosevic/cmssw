@@ -107,7 +107,7 @@ double PATTauDiscriminationAgainstElectronMVA6::discriminate(const TauRef& theTa
 	double deltaREleTau = deltaR(theElectron.p4(), theTauRef->p4());
 	deltaRDummy = deltaREleTau;
 	if( deltaREleTau < 0.3 ){ 	
-	  double mva_match = mva_->MVAValue(*theTauRef, theElectron);	  
+	  double mva_match = mva_->MVAValue(*theTauRef, theElectron, true);	  
 	  bool hasGsfTrack = 0;
           pat::PackedCandidate const* packedLeadTauCand = dynamic_cast<pat::PackedCandidate const*>(theTauRef->leadChargedHadrCand().get());
           if( abs(packedLeadTauCand->pdgId()) == 11 ) 
@@ -145,7 +145,7 @@ double PATTauDiscriminationAgainstElectronMVA6::discriminate(const TauRef& theTa
      } // end of loop over electrons
 
     if ( !isGsfElectronMatched ) {
-      mvaValue = mva_->MVAValue(*theTauRef);
+      mvaValue = mva_->MVAValue(*theTauRef, true);
       bool hasGsfTrack = 0;
       pat::PackedCandidate const* packedLeadTauCand = dynamic_cast<pat::PackedCandidate const*>(theTauRef->leadChargedHadrCand().get());
       if( abs(packedLeadTauCand->pdgId()) == 11 ) hasGsfTrack = 1;

@@ -147,7 +147,7 @@ double PFRecoTauDiscriminationAgainstElectronMVA6::discriminate(const PFTauRef& 
 	double deltaREleTau = deltaR(theGsfElectron->p4(), thePFTauRef->p4());
 	deltaRDummy = deltaREleTau;
 	if ( deltaREleTau < 0.3 ) {
-	  double mva_match = mva_->MVAValue(*thePFTauRef, *theGsfElectron);
+	  double mva_match = mva_->MVAValue(*thePFTauRef, *theGsfElectron, true);
 	  bool hasGsfTrack = thePFTauRef->leadPFChargedHadrCand()->gsfTrackRef().isNonnull();
 	  if ( !hasGsfTrack )
             hasGsfTrack = theGsfElectron->gsfTrack().isNonnull();
@@ -184,7 +184,7 @@ double PFRecoTauDiscriminationAgainstElectronMVA6::discriminate(const PFTauRef& 
     } // end of loop over electrons
 
     if ( !isGsfElectronMatched ) {
-      mvaValue = mva_->MVAValue(*thePFTauRef);
+      mvaValue = mva_->MVAValue(*thePFTauRef, true);
       bool hasGsfTrack = thePFTauRef->leadPFChargedHadrCand()->gsfTrackRef().isNonnull();
       
       //// Veto taus that go to Ecal crack
