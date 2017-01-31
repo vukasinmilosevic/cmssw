@@ -32,7 +32,8 @@ class PATTauDiscriminationAgainstElectronMVA6 : public PATTauDiscriminationProdu
     mva_ = new AntiElectronIDMVA6(cfg);
     
     usefixPhiAtEcalEntrance_ = cfg.getParameter<bool>("usefixPhiAtEcalEntrance");
-    
+    if ( !usefixPhiAtEcalEntrance_ ) throw edm::Exception(edm::errors::UnimplementedFeature) << "genuine definition of phiAtEcalEntrance not available in miniAODs for release 80X, please modify the cfi file \n";
+
     srcElectrons = cfg.getParameter<edm::InputTag>("srcElectrons");
     electronToken = consumes<pat::ElectronCollection>(srcElectrons);
     verbosity_ = ( cfg.exists("verbosity") ) ?
@@ -81,8 +82,7 @@ void PATTauDiscriminationAgainstElectronMVA6::beginEvent(const edm::Event& evt, 
   category_output_.reset(new PATTauDiscriminator(TauRefProd(taus_)));
 
   evt.getByToken(electronToken, Electrons);
-  
-  if ( !usefixPhiAtEcalEntrance_ ) throw edm::Exception(edm::errors::UnimplementedFeature) << "genuine definition of phiAtEcalEntrance not available in miniAODs for release 80X, please modify the cfi file \n";
+
 }
 
 double PATTauDiscriminationAgainstElectronMVA6::discriminate(const TauRef& theTauRef) const
