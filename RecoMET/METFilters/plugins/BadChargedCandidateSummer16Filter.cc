@@ -24,10 +24,10 @@
 // class declaration
 //
 
-class BadChargedCandidateFilter : public edm::global::EDFilter<> {
+class BadChargedCandidateSummer16Filter : public edm::global::EDFilter<> {
 public:
-  explicit BadChargedCandidateFilter(const edm::ParameterSet&);
-  ~BadChargedCandidateFilter();
+  explicit BadChargedCandidateSummer16Filter(const edm::ParameterSet&);
+  ~BadChargedCandidateSummer16Filter();
 
 private:
   virtual bool filter(edm::StreamID iID, edm::Event&, const edm::EventSetup&) const override;
@@ -42,16 +42,14 @@ private:
   const double          maxDR_;
   const double          minPtDiffRel_;
   const double          minMuonTrackRelErr_;
-  const double          innerTrackRelErr_;
   const double          minMuonPt_;
-  const double          segmentCompatibility_;
 
 };
 
 //
 // constructors and destructor
 //
-BadChargedCandidateFilter::BadChargedCandidateFilter(const edm::ParameterSet& iConfig)
+BadChargedCandidateSummer16Filter::BadChargedCandidateSummer16Filter(const edm::ParameterSet& iConfig)
   : tokenPFCandidates_ ( consumes<edm::View<reco::Candidate> >(iConfig.getParameter<edm::InputTag> ("PFCandidates")  ))
   , tokenMuons_ ( consumes<edm::View<reco::Muon> >(iConfig.getParameter<edm::InputTag> ("muons")  ))
   , taggingMode_          ( iConfig.getParameter<bool>    ("taggingMode") )
@@ -59,14 +57,12 @@ BadChargedCandidateFilter::BadChargedCandidateFilter(const edm::ParameterSet& iC
   , maxDR_                ( iConfig.getParameter<double>  ("maxDR") )
   , minPtDiffRel_         ( iConfig.getParameter<double>  ("minPtDiffRel") )
   , minMuonTrackRelErr_   ( iConfig.getParameter<double>  ("minMuonTrackRelErr") )
-  , innerTrackRelErr_     ( iConfig.getParameter<double>  ("innerTrackRelErr") )
   , minMuonPt_            ( iConfig.getParameter<double>  ("minMuonPt") )
-  , segmentCompatibility_ ( iConfig.getParameter<double>  ("segmentCompatibility") )
 {
   produces<bool>();
 }
 
-BadChargedCandidateFilter::~BadChargedCandidateFilter() { }
+BadChargedCandidateSummer16Filter::~BadChargedCandidateSummer16Filter() { }
 
 
 //
@@ -75,7 +71,7 @@ BadChargedCandidateFilter::~BadChargedCandidateFilter() { }
 
 // ------------ method called on each new Event  ------------
 bool
-BadChargedCandidateFilter::filter(edm::StreamID iID, edm::Event& iEvent, const edm::EventSetup& iSetup) const
+BadChargedCandidateSummer16Filter::filter(edm::StreamID iID, edm::Event& iEvent, const edm::EventSetup& iSetup) const
 {
   using namespace std;
   using namespace edm;
@@ -94,39 +90,24 @@ BadChargedCandidateFilter::filter(edm::StreamID iID, edm::Event& iEvent, const e
 
     const reco::Muon & muon = (*muons)[i];
 
-    reco::TrackRef bestMuonTrack = muon.muonBestTrack();
-
-    if (debug_) cout<<"BadChargedCandidate test:Muon "<< i << endl;
-    // reco::TrackRef innerMuonTrack = muon.innerTrack();
-    //  if ( muon.pt() < minMuonPt_ && innerMuonTrack->pt() < minMuonPt_) {
-    //  if (debug_) cout <<"skipping the muon because low muon pt" << endl;
-    //  continue ; } {
-    {
-       reco::TrackRef innerMuonTrack = muon.innerTrack();
+    if ( muon.pt() > minMuonPt_) {
+        reco::TrackRef innerMuonTrack = muon.innerTrack();
         if (debug_) cout<<"muon "<<muon.pt()<<endl;
-	
+
         if ( innerMuonTrack.isNull() ) { 
             if (debug_) cout<<"Skipping this muon because it has no inner track"<<endl; 
             continue; 
             };
-
-	if ( muon.pt() < minMuonPt_ && innerMuonTrack->pt() < minMuonPt_) {
-          if (debug_) cout <<"skipping the muon because low muon pt" << endl;
-          continue;
+        if ( innerMuonTrack->quality(reco::TrackBase::highPurity) ) { 
+            if (debug_) cout<<"Skipping this muon because inner track is high purity."<<endl; 
+            continue;
         }
-
-	// Consider only Global Muons  	
-	if (muon.isGlobalMuon() == 0) {
-	  if(debug_) cout << "Skipping this muon because not a Global Muon" << endl;
-	  continue;
-	}
-
-	if (debug_) cout << "SegmentCompatibility :"<< muon::segmentCompatibility(muon) << "RelPtErr:" << bestMuonTrack->ptError()/bestMuonTrack->pt() << endl;
-	if (muon::segmentCompatibility(muon) > segmentCompatibility_ && bestMuonTrack->ptError()/bestMuonTrack->pt() < minMuonTrackRelErr_ && innerMuonTrack->ptError()/innerMuonTrack->pt() < innerTrackRelErr_ ) {
-	  if (debug_) cout <<"Skipping this muon because segment compatiblity > 0.3 and relErr(best track) <2 and relErr(inner track) < 1 " << endl;
-	  continue;
-	}
-
+        // Consider only muons with large relative pt error
+        if (debug_) cout<<"Muon inner track pt rel err: "<<innerMuonTrack->ptError()/innerMuonTrack->pt()<<endl;
+        if (not ( innerMuonTrack->ptError()/innerMuonTrack->pt() > minMuonTrackRelErr_ ) ) {
+            if (debug_) cout<<"Skipping this muon because seems well measured."<<endl; 
+            continue;
+        }
         for ( unsigned j=0; j < pfCandidates->size(); ++j ) {
             const reco::Candidate & pfCandidate = (*pfCandidates)[j];
             // look for charged hadrons
@@ -135,8 +116,9 @@ BadChargedCandidateFilter::filter(edm::StreamID iID, edm::Event& iEvent, const e
             float dpt = ( pfCandidate.pt() - innerMuonTrack->pt())/(0.5*(innerMuonTrack->pt() + pfCandidate.pt()));
             if ( (debug_)  and (dr<0.5) ) cout<<" pt(it) "<<innerMuonTrack->pt()<<" candidate "<<pfCandidate.pt()<<" dr "<< dr
                 <<" dpt "<<dpt<<endl;
-            // require similar pt and small dR , updated to tight comditions and PF check
-            if ( ( dr < maxDR_ )  and ( fabs(dpt) < minPtDiffRel_ ) and (muon.isPFMuon()==0) ) {
+            // require similar pt ( one sided ) and small dR
+            if ( ( deltaR( innerMuonTrack->eta(), innerMuonTrack->phi(), pfCandidate.eta(), pfCandidate.phi() ) < maxDR_ ) 
+                and ( ( pfCandidate.pt() - innerMuonTrack->pt())/(0.5*(innerMuonTrack->pt() + pfCandidate.pt())) > minPtDiffRel_ ) ) {
                     foundBadChargedCandidate = true;
                     cout <<"found bad track!"<<endl; 
                     break;
@@ -148,7 +130,7 @@ BadChargedCandidateFilter::filter(edm::StreamID iID, edm::Event& iEvent, const e
 
   bool pass = !foundBadChargedCandidate;
 
-  if (debug_) cout<<"BadChargedCandidateFilter pass: "<<pass<<endl;
+  if (debug_) cout<<"pass: "<<pass<<endl;
 
   iEvent.put( std::auto_ptr<bool>(new bool(pass)) );
 
@@ -156,4 +138,4 @@ BadChargedCandidateFilter::filter(edm::StreamID iID, edm::Event& iEvent, const e
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(BadChargedCandidateFilter);
+DEFINE_FWK_MODULE(BadChargedCandidateSummer16Filter);
