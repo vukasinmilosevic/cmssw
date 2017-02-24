@@ -8,7 +8,7 @@ process.load('Configuration.Geometry.GeometrySimDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
 
 process.source = cms.Source("PoolSource",
 	fileNames = cms.untracked.vstring(
@@ -70,7 +70,8 @@ process.rerunDiscriminationAgainstElectronMVA6 = patTauDiscriminationAgainstElec
 	minMVANoEleMatchWgWOgsfEC  = cms.double(0.0),
 	minMVAWOgWgsfEC            = cms.double(0.0),
 	minMVAWgWgsfEC             = cms.double(0.0),
-	srcElectrons = cms.InputTag('slimmedElectrons')
+	srcElectrons = cms.InputTag('slimmedElectrons'),
+	usefixPhiAtEcalEntrance    = cms.bool(True)
 )
 
 process.rerunDiscriminationByIsolationMVArun2v1Loose = process.rerunDiscriminationByIsolationMVArun2v1VLoose.clone()

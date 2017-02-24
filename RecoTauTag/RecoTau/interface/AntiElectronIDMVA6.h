@@ -23,6 +23,11 @@
 #include "DataFormats/PatCandidates/interface/Tau.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 
+#include "FastSimulation/BaseParticlePropagator/interface/BaseParticlePropagator.h"
+#include "FastSimulation/Particle/interface/RawParticle.h"
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
+#include <TMath.h>
+
 #include "TMVA/Tools.h"
 #include "TMVA/Reader.h"
 
@@ -119,16 +124,19 @@ class AntiElectronIDMVA6
 
    // this function can be called for all categories
    double MVAValue(const reco::PFTau& thePFTau, 
-		   const reco::GsfElectron& theGsfEle);
+		   const reco::GsfElectron& theGsfEle, bool usefixPhiAtEcalEntrance);
    // this function can be called for category 1 only !!
-   double MVAValue(const reco::PFTau& thePFTau);
+   double MVAValue(const reco::PFTau& thePFTau, bool usefixPhiAtEcalEntrance);
 
    // this function can be called for all categories
    double MVAValue(const pat::Tau& theTau, 
-		   const pat::Electron& theEle);
+		   const pat::Electron& theEle, bool usefixPhiAtEcalEntrance);
    // this function can be called for category 1 only !!
-   double MVAValue(const pat::Tau& theTau);
+   double MVAValue(const pat::Tau& theTau, bool usefixPhiAtEcalEntrance);
    
+   //
+   bool atECalEntrance(const reco::Candidate* part,
+		       math::XYZPoint &pos);		       
  private:   
 
    double dCrackEta(double eta);
