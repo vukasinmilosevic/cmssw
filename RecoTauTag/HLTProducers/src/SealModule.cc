@@ -5,6 +5,8 @@
 #include "RecoTauTag/HLTProducers/interface/PFJetToCaloProducer.h"
 #include "RecoTauTag/HLTProducers/interface/L1HLTJetsMatching.h"
 #include "RecoTauTag/HLTProducers/interface/L1HLTTauMatching.h"
+#include "RecoTauTag/HLTProducers/interface/L1CaloJetsMatching.h"
+#include "RecoTauTag/HLTProducers/interface/L1PFJetsMatching.h"
 #include "RecoTauTag/HLTProducers/interface/L1THLTTauMatching.h"
 #include "RecoTauTag/HLTProducers/interface/L2TauJetsMerger.h"
 #include "RecoTauTag/HLTProducers/interface/CaloTowerCreatorForTauHLT.h"
@@ -27,6 +29,8 @@ DEFINE_EDM_PLUGIN(TrackingRegionProducerFactory, CandidateSeededTrackingRegionsP
 DEFINE_FWK_MODULE(L2TauJetsMerger);
 DEFINE_FWK_MODULE(L1HLTJetsMatching);
 DEFINE_FWK_MODULE(L1HLTTauMatching);
+DEFINE_FWK_MODULE(L1CaloJetsMatching);
+DEFINE_FWK_MODULE(L1PFJetsMatching);
 DEFINE_FWK_MODULE(L1THLTTauMatching);
 DEFINE_FWK_MODULE(CaloTowerCreatorForTauHLT);
 DEFINE_FWK_MODULE(CaloTowerFromL1TCreatorForTauHLT);
