@@ -1532,6 +1532,7 @@ bool L1TdeStage2CaloLayer2::compareSums(
           edm::LogInfo("L1TdeStage2CaloLayer2") << "x ";
         else
           edm::LogInfo("L1TdeStage2CaloLayer2") << "  ";
+
         edm::LogInfo("L1TdeStage2CaloLayer2") << dataEt << "\t" << emulEt;
         edm::LogInfo("L1TdeStage2CaloLayer2") << std::endl;
       }
@@ -1563,6 +1564,7 @@ bool L1TdeStage2CaloLayer2::compareSums(
           edm::LogInfo("L1TdeStage2CaloLayer2") << "x ";
         else
           edm::LogInfo("L1TdeStage2CaloLayer2") << "  ";
+
         edm::LogInfo("L1TdeStage2CaloLayer2") << dataEt << "\t" << emulEt;
         edm::LogInfo("L1TdeStage2CaloLayer2") << std::endl;
       }
